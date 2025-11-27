@@ -7,7 +7,7 @@
     <style>
         * {
             margin: 0;
-            padding: 0;
+        padding: 0;
             box-sizing: border-box;
         }
         
@@ -205,17 +205,17 @@
         <div class="form-group">
             <label for="quantity">Carton Quantity</label>
             <input type="number" id="quantity" placeholder="Enter quantity" min="1">
-        </div>
+            </div>
         
         <button class="calculate-btn" onclick="calculate()">Calculate</button>
         
         <div class="results" id="results">
             <div class="result-item" id="sheetLengthRow">
-                <span class="result-label">Sheet Length (L):</span>
+                <span class="result-label">Blank Sheet Length (L):</span>
                 <span class="result-value" id="sheetLength">-</span>
             </div>
             <div class="result-item" id="sheetWidthRow">
-                <span class="result-label">Sheet Width (W):</span>
+                <span class="result-label">Blank Sheet Width (W):</span>
                 <span class="result-value" id="sheetWidth">-</span>
             </div>
             <div class="result-item">
@@ -227,23 +227,23 @@
                 <span class="result-value" id="totalArea">-</span>
             </div>
             <div class="result-item" id="unitPriceRow" style="display: none;">
-                <span class="result-label">Unit Price:</span>
+                <span class="result-label">SQM Price:</span>
                 <span class="result-value" id="unitPrice">-</span>
             </div>
             <div class="result-item" id="totalPriceRow" style="display: none;">
-                <span class="result-label">Total Price:</span>
+                <span class="result-label">Total Price (LC Price):</span>
                 <span class="result-value" id="totalPrice">-</span>
             </div>
             <div class="result-item" id="rebateRow" style="display: none;">
-                <span class="result-label">Rebates for Matalan:</span>
+                <span class="result-label" id="rebateLabel">Rebates for Matalan:</span>
                 <span class="result-value" id="rebate">-</span>
             </div>
             <div class="result-item" id="pacdRow" style="display: none;">
-                <span class="result-label">5% For PacD:</span>
+                <span class="result-label" id="pacdLabel">For PacD:</span>
                 <span class="result-value" id="pacd">-</span>
             </div>
             <div class="result-item" id="supplierPriceRow" style="display: none;">
-                <span class="result-label">Price For Packaging Supplier:</span>
+                <span class="result-label">Packaging Supplier Price:</span>
                 <span class="result-value" id="supplierPrice">-</span>
             </div>
             
@@ -253,230 +253,272 @@
         </div>
     </div>
 
-<script>
-    // *** EDIT THIS LINE TO CHANGE THE USER ROLE ***
-    // Options: 'admin', 'garment_supplier', 'packaging_supplier'
-    const role = 'packaging_supplier'; 
-    // **********************************************
+    <script>
+        // *** EDIT THIS LINE TO CHANGE THE USER ROLE ***
+        // Options: 'admin', 'garment_supplier', 'packaging_supplier'
+        const role = 'packaging_supplier'; 
+        // **********************************************
 
-    const cartonData = {
-        'A1': { L: 495, W: 285, H: 375, price: 0.97 },
-        'A2': { L: 495, W: 285, H: 310, price: 0.88 },
-        'A3': { L: 495, W: 285, H: 260, price: 0.81 },
-        'B1': { L: 595, W: 285, H: 375, price: 1.10 },
-        'B2': { L: 595, W: 285, H: 310, price: 0.99 },
-        'B3': { L: 595, W: 285, H: 260, price: 0.90 },
-        'C1': { L: 595, W: 325, H: 375, price: 1.22 },
-        'C2': { L: 595, W: 325, H: 310, price: 1.10 },
-        'C3': { L: 595, W: 325, H: 260, price: 1.02 },
-        'D1': { L: 595, W: 380, H: 375, price: 1.39 },
-        'D2': { L: 595, W: 380, H: 310, price: 1.27 },
-        'D3': { L: 595, W: 380, H: 260, price: 1.18 },
-        'R-FPA': { L: 495, W: 285, H: null, price: 1.03 },
-        'R-FPB': { L: 595, W: 285, H: null, price: 1.03 },
-        'R-FPC': { L: 595, W: 325, H: null, price: 1.03 },
-        'R-FPD': { L: 595, W: 380, H: null, price: 1.03 }
-    };
+        const cartonData = {
+            'A1': { L: 495, W: 285, H: 375, sqmPrice: 0.97 },
+            'A2': { L: 495, W: 285, H: 310, sqmPrice: 0.88 },
+            'A3': { L: 495, W: 285, H: 260, sqmPrice: 0.81 },
+            'B1': { L: 595, W: 285, H: 375, sqmPrice: 1.10 },
+            'B2': { L: 595, W: 285, H: 310, sqmPrice: 0.99 },
+            'B3': { L: 595, W: 285, H: 260, sqmPrice: 0.90 },
+            'C1': { L: 595, W: 325, H: 375, sqmPrice: 1.22 },
+            'C2': { L: 595, W: 325, H: 310, sqmPrice: 1.10 },
+            'C3': { L: 595, W: 325, H: 260, sqmPrice: 1.02 },
+            'D1': { L: 595, W: 380, H: 375, sqmPrice: 1.39 },
+            'D2': { L: 595, W: 380, H: 310, sqmPrice: 1.27 },
+            'D3': { L: 595, W: 380, H: 260, sqmPrice: 1.18 },
+            'R-FPA': { L: 495, W: 285, H: null, sqmPrice: 1.03 },
+            'R-FPB': { L: 595, W: 285, H: null, sqmPrice: 1.03 },
+            'R-FPC': { L: 595, W: 325, H: null, sqmPrice: 1.03 },
+            'R-FPD': { L: 595, W: 380, H: null, sqmPrice: 1.03 }
+        };
 
-    const allResultRows = [
-        'sheetLengthRow', 'sheetWidthRow', 'unitPriceRow', 'totalPriceRow',
-        'rebateRow', 'pacdRow', 'supplierPriceRow'
-    ];
+        const allResultRows = [
+            'sheetLengthRow', 'sheetWidthRow', 'unitPriceRow', 'totalPriceRow',
+            'rebateRow', 'pacdRow', 'supplierPriceRow'
+        ];
 
-    function clearDimensions() {
-        // Clear and disable dimensions
-        document.getElementById('length').value = '';
-        document.getElementById('width').value = '';
-        document.getElementById('height').value = '';
-        document.getElementById('length').disabled = true;
-        document.getElementById('width').disabled = true;
-        document.getElementById('height').disabled = true;
-    }
-
-    function updateCartonStyle() {
-        const flute = document.getElementById('flute').value;
-        const cartonStyleSelect = document.getElementById('cartonStyle');
-        const cartonSelectionSelect = document.getElementById('cartonSelection');
-        
-        // 1. Reset lower levels
-        cartonStyleSelect.innerHTML = '<option value="">Select Carton Style</option>';
-        cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
-        
-        // 2. Disable dependents
-        cartonStyleSelect.disabled = true;
-        cartonSelectionSelect.disabled = true;
-        
-        clearDimensions();
-        document.getElementById('results').classList.remove('show');
-        
-        if (flute === 'bc-flute') {
-            cartonStyleSelect.innerHTML += '<option value="standard">Standard Carton - Singles</option>';
-            cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
-            cartonStyleSelect.disabled = false; // ENABLE Carton Style here
-        } else if (flute === 'c-flute') {
-            cartonStyleSelect.innerHTML += '<option value="ratio">Ratio Carton</option>';
-            cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
-            cartonStyleSelect.disabled = false; // ENABLE Carton Style here
+        function clearDimensions() {
+            // Clear and disable dimensions
+            document.getElementById('length').value = '';
+            document.getElementById('width').value = '';
+            document.getElementById('height').value = '';
+            document.getElementById('length').disabled = true;
+            document.getElementById('width').disabled = true;
+            document.getElementById('height').disabled = true;
         }
-    }
 
-    function updateCartonSelection() {
-        const cartonStyle = document.getElementById('cartonStyle').value;
-        const cartonSelectionSelect = document.getElementById('cartonSelection');
-        
-        // 1. Reset lower levels
-        cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
-        
-        // 2. Disable dependents
-        cartonSelectionSelect.disabled = true;
-        clearDimensions();
-
-        document.getElementById('results').classList.remove('show');
-        
-        if (cartonStyle === 'standard') {
-            const options = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'D1', 'D2', 'D3'];
-            options.forEach(opt => {
-                cartonSelectionSelect.innerHTML += `<option value="${opt}">${opt}</option>`;
-            });
-            cartonSelectionSelect.disabled = false; // ENABLE Carton Selection here
-        } else if (cartonStyle === 'ratio') {
-            const options = ['R-FPA', 'R-FPB', 'R-FPC', 'R-FPD'];
-            options.forEach(opt => {
-                cartonSelectionSelect.innerHTML += `<option value="${opt}">${opt}</option>`;
-            });
-            cartonSelectionSelect.disabled = false; // ENABLE Carton Selection here
-        } else if (cartonStyle === 'custom') {
-            cartonSelectionSelect.innerHTML += '<option value="custom">Custom Carton</option>';
-            cartonSelectionSelect.disabled = false;
-            cartonSelectionSelect.value = 'custom';
-            updateDimensions(); // Call updateDimensions immediately for custom to enable dimension fields
-        }
-    }
-
-    function updateDimensions() {
-        const selection = document.getElementById('cartonSelection').value;
-        const lengthInput = document.getElementById('length');
-        const widthInput = document.getElementById('width');
-        const heightInput = document.getElementById('height');
-        
-        clearDimensions(); // Start by resetting fields to clear previous data/state
-        
-        if (selection === 'custom') {
-            // Enable all fields for custom carton and clear values
-            lengthInput.disabled = false;
-            widthInput.disabled = false;
-            heightInput.disabled = false;
-        } else if (selection && cartonData[selection]) {
-            const data = cartonData[selection];
-            lengthInput.value = data.L || '';
-            widthInput.value = data.W || '';
-            heightInput.value = data.H || '';
+        function updateCartonStyle() {
+            const flute = document.getElementById('flute').value;
+            const cartonStyleSelect = document.getElementById('cartonStyle');
+            const cartonSelectionSelect = document.getElementById('cartonSelection');
             
-            const isRatioCarton = selection.startsWith('R-');
+            // 1. Reset lower levels
+            cartonStyleSelect.innerHTML = '<option value="">Select Carton Style</option>';
+            cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
             
-            if (isRatioCarton) {
-                // For ratio cartons: length and width locked, height editable
-                lengthInput.disabled = true;
-                widthInput.disabled = true;
-                heightInput.disabled = false;
+            // 2. Disable dependents initially
+            cartonSelectionSelect.disabled = true;
+            
+            clearDimensions();
+            document.getElementById('results').classList.remove('show');
+            
+            if (flute === 'bc-flute') {
+                cartonStyleSelect.innerHTML += '<option value="standard">Standard Carton - Singles</option>';
+                cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
+                cartonStyleSelect.disabled = false;
+            } else if (flute === 'c-flute') {
+                cartonStyleSelect.innerHTML += '<option value="ratio">Ratio Carton</option>';
+                cartonStyleSelect.innerHTML += '<option value="custom">Custom Carton</option>';
+                cartonStyleSelect.disabled = false;
             } else {
-                // For standard cartons: all fields locked and disabled
+                // If no flute selected, disable carton style
+                cartonStyleSelect.disabled = true;
+            }
+        }
+
+        function updateCartonSelection() {
+            const cartonStyle = document.getElementById('cartonStyle').value;
+            const cartonSelectionSelect = document.getElementById('cartonSelection');
+            
+            // 1. Reset lower levels
+            cartonSelectionSelect.innerHTML = '<option value="">Select Carton</option>';
+            
+            // 2. Disable dependents
+            cartonSelectionSelect.disabled = true;
+            clearDimensions();
+
+            document.getElementById('results').classList.remove('show');
+            
+            if (cartonStyle === 'standard') {
+                // Array of carton keys
+                const options = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'D1', 'D2', 'D3'];
+                
+                options.forEach(opt => {
+                    const data = cartonData[opt];
+                    // Format: A1 (L x W x H mm)
+                    const display = `${opt} (${data.L} x ${data.W} x ${data.H} mm)`;
+                    cartonSelectionSelect.innerHTML += `<option value="${opt}">${display}</option>`;
+                });
+                cartonSelectionSelect.disabled = false; // ENABLE Carton Selection here
+            } else if (cartonStyle === 'ratio') {
+                const options = ['R-FPA', 'R-FPB', 'R-FPC', 'R-FPD'];
+                
+                options.forEach(opt => {
+                    const data = cartonData[opt];
+                    // Format: R-FPA (L x W mm) - H is null, so it is omitted
+                    const display = `${opt} (${data.L} x ${data.W} mm)`;
+                    cartonSelectionSelect.innerHTML += `<option value="${opt}">${display}</option>`;
+                });
+                cartonSelectionSelect.disabled = false; // ENABLE Carton Selection here
+            } else if (cartonStyle === 'custom') {
+                cartonSelectionSelect.innerHTML += '<option value="custom">Custom Carton (Enter dimensions below)</option>';
+                cartonSelectionSelect.disabled = false;
+                cartonSelectionSelect.value = 'custom';
+                updateDimensions(); // Call updateDimensions immediately for custom to enable dimension fields
+            }
+        }
+
+        function updateDimensions() {
+            const selection = document.getElementById('cartonSelection').value;
+            const lengthInput = document.getElementById('length');
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+            
+            // Clear values first
+            lengthInput.value = '';
+            widthInput.value = '';
+            heightInput.value = '';
+            
+            if (selection === 'custom') {
+                // Enable all fields for custom carton
+                lengthInput.disabled = false;
+                widthInput.disabled = false;
+                heightInput.disabled = false;
+            } else if (selection && cartonData[selection]) {
+                const data = cartonData[selection];
+                lengthInput.value = data.L || '';
+                widthInput.value = data.W || '';
+                heightInput.value = data.H || '';
+                
+                const isRatioCarton = selection.startsWith('R-');
+                
+                if (isRatioCarton) {
+                    // For ratio cartons: length and width locked, height editable
+                    lengthInput.disabled = true;
+                    widthInput.disabled = true;
+                    heightInput.disabled = false;
+                } else {
+                    // For standard cartons: all fields locked and disabled
+                    lengthInput.disabled = true;
+                    widthInput.disabled = true;
+                    heightInput.disabled = true;
+                }
+            } else {
+                // No selection - disable all
                 lengthInput.disabled = true;
                 widthInput.disabled = true;
                 heightInput.disabled = true;
             }
+            
+            document.getElementById('results').classList.remove('show');
         }
-        
-        document.getElementById('results').classList.remove('show');
-    }
 
-    function calculate() {
-        const flute = document.getElementById('flute').value;
-        const selection = document.getElementById('cartonSelection').value;
-        const length = parseFloat(document.getElementById('length').value);
-        const width = parseFloat(document.getElementById('width').value);
-        const height = parseFloat(document.getElementById('height').value);
-        const quantity = parseFloat(document.getElementById('quantity').value);
-        
-        if (!flute || !selection || !length || !width || !height || !quantity || quantity <= 0) {
-            alert('Please fill in all dimensions, select flute/carton, and enter a valid quantity.');
-            return;
-        }
-        
-        // --- Calculation Logic ---
-        const L = (length + width) * 2 + 15;
-        const W = (width + height) - 10;
-        const areaPerCarton = (L * W * 1.1) / 1000000;
-        const totalArea = areaPerCarton * quantity;
-        
-        document.getElementById('sheetLength').textContent = L.toFixed(2) + ' mm';
-        document.getElementById('sheetWidth').textContent = W.toFixed(2) + ' mm';
-        document.getElementById('areaPerCarton').textContent = areaPerCarton.toFixed(6) + ' m²';
-        document.getElementById('totalArea').textContent = totalArea.toFixed(6) + ' m²';
-
-        // --- Reset all price/dimension rows to hidden initially ---
-        allResultRows.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.style.display = 'none';
-        });
-        document.getElementById('customMessage').style.display = 'none';
-
-        const isCustom = selection === 'custom';
-        
-        if (!isCustom) {
-            const unitPrice = cartonData[selection].price;
-            const totalPrice = unitPrice * quantity;
+        function calculate() {
+            const flute = document.getElementById('flute').value;
+            const cartonStyle = document.getElementById('cartonStyle').value;
+            const selection = document.getElementById('cartonSelection').value;
+            const length = parseFloat(document.getElementById('length').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const quantity = parseFloat(document.getElementById('quantity').value);
             
-            const rebatePercent = flute === 'bc-flute' ? 0.04 : 0.10;
-            const rebate = totalPrice * rebatePercent;
-            
-            const pacdPercent = flute === 'bc-flute' ? 0.05 : 0.10;
-            const pacd = (totalPrice - rebate) * pacdPercent;
-            
-            const supplierPrice = totalPrice - rebate - pacd;
-
-            document.getElementById('unitPrice').textContent = '$' + unitPrice.toFixed(2);
-            document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
-            document.getElementById('rebate').textContent = '$' + rebate.toFixed(2) + ' (' + (rebatePercent * 100) + '%)';
-            document.getElementById('pacd').textContent = '$' + pacd.toFixed(2) + ' (' + (pacdPercent * 100) + '%)';
-            document.getElementById('supplierPrice').textContent = '$' + supplierPrice.toFixed(2);
-
-            // --- ROLE-BASED VISIBILITY CONTROL ---
-            
-            // Display only the relevant price row(s) based on role
-            if (role === 'admin') {
-                document.getElementById('unitPriceRow').style.display = 'flex';
-                document.getElementById('totalPriceRow').style.display = 'flex';
-                document.getElementById('rebateRow').style.display = 'flex';
-                document.getElementById('pacdRow').style.display = 'flex';
-                document.getElementById('supplierPriceRow').style.display = 'flex';
-            } else if (role === 'garment_supplier') {
-                document.getElementById('totalPriceRow').style.display = 'flex'; 
-            } else if (role === 'packaging_supplier') {
-                document.getElementById('supplierPriceRow').style.display = 'flex';
+            if (!flute || !selection || !length || !width || !height || !quantity || quantity <= 0) {
+                alert('Please fill in all dimensions, select flute/carton, and enter a valid quantity.');
+                return;
             }
-
-            // Area per Carton and Total Area are always shown for non-custom cartons (indexes 2 and 3)
-            document.getElementById('results').children[2].style.display = 'flex';
-            document.getElementById('results').children[3].style.display = 'flex';
             
-        } else {
-            // Custom carton logic (Price rows hidden for custom, except for Admin)
-            document.getElementById('customMessage').style.display = 'block';
+            let L, W, areaPerCarton;
 
-            // Area rows remain visible for custom
-            document.getElementById('results').children[2].style.display = 'flex';
-            document.getElementById('results').children[3].style.display = 'flex';
+            // --- Flute-Dependent Calculation Logic ---
+            if (flute === 'bc-flute') {
+                // BC-Flute Conditions: L = (length + width) *2 + 11, W = (height + width) - 16
+                L = (length + width) * 2 + 11;
+                W = (height + width) - 16;
+                areaPerCarton = (L * W) / 1000000;
+                
+                // Add 10% if BC-Flute and Custom Carton
+                if (cartonStyle === 'custom') {
+                    areaPerCarton = areaPerCarton * 1.1;
+                }
+            } else if (flute === 'c-flute') {
+                // C-Flute Conditions: L = (length + width) * 2 + 15, W = (width + height) - 10, Area = L*W*(1+10%)/1000000
+                L = (length + width) * 2 + 15;
+                W = (width + height) - 10;
+                areaPerCarton = (L * W * 1.1) / 1000000;
+            } else {
+                // Should not happen if inputs are validated, but as a fallback:
+                alert('Invalid Flute Type selected.');
+                return;
+            }
+            
+            const totalArea = areaPerCarton * quantity;
+            
+            document.getElementById('sheetLength').textContent = L.toFixed(2) + ' mm';
+            document.getElementById('sheetWidth').textContent = W.toFixed(2) + ' mm';
+            document.getElementById('areaPerCarton').textContent = areaPerCarton.toFixed(6) + ' m²';
+            document.getElementById('totalArea').textContent = totalArea.toFixed(6) + ' m²';
+
+            // --- Reset all price/dimension rows to hidden initially ---
+            allResultRows.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
+            document.getElementById('customMessage').style.display = 'none';
+
+            const isCustom = selection === 'custom';
+            
+            if (!isCustom) {
+                const sqmPrice = cartonData[selection].sqmPrice;
+                const totalPrice = totalArea * sqmPrice;
+                
+                const rebatePercent = flute === 'bc-flute' ? 0.05 : 0.10;
+                const rebate = totalPrice * rebatePercent;
+                
+                const pacdPercent = flute === 'bc-flute' ? 0.04 : 0.09;
+                const pacd = (totalPrice - rebate) * pacdPercent;
+                
+                const supplierPrice = totalPrice - rebate - pacd;
+
+                // Update labels with percentages
+                document.getElementById('rebateLabel').textContent = `Rebates for Matalan (${rebatePercent * 100}%):`;
+                document.getElementById('pacdLabel').textContent = `For PacD (${pacdPercent * 100}%):`;
+
+                document.getElementById('unitPrice').textContent = '$' + sqmPrice.toFixed(2);
+                document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
+                document.getElementById('rebate').textContent = '$' + rebate.toFixed(2);
+                document.getElementById('pacd').textContent = '$' + pacd.toFixed(2);
+                document.getElementById('supplierPrice').textContent = '$' + supplierPrice.toFixed(2);
+
+                // --- ROLE-BASED VISIBILITY CONTROL ---
+                
+                if (role === 'admin') {
+                    document.getElementById('unitPriceRow').style.display = 'flex';
+                    document.getElementById('totalPriceRow').style.display = 'flex';
+                    document.getElementById('rebateRow').style.display = 'flex';
+                    document.getElementById('pacdRow').style.display = 'flex';
+                    document.getElementById('supplierPriceRow').style.display = 'flex';
+                } else if (role === 'garment_supplier') {
+                    document.getElementById('totalPriceRow').style.display = 'flex'; 
+                } else if (role === 'packaging_supplier') {
+                    document.getElementById('supplierPriceRow').style.display = 'flex';
+                }
+
+                // Area per Carton and Total Area are always shown for non-custom cartons (indexes 2 and 3)
+                document.getElementById('results').children[2].style.display = 'flex';
+                document.getElementById('results').children[3].style.display = 'flex';
+                
+            } else {
+                // Custom carton logic
+                document.getElementById('customMessage').style.display = 'block';
+
+                // Area rows remain visible for custom
+                document.getElementById('results').children[2].style.display = 'flex';
+                document.getElementById('results').children[3].style.display = 'flex';
+            }
+            
+            // Sheet Dimensions are ONLY shown for Admin (regardless of custom or standard)
+            const showSheetDimensions = role === 'admin';
+            document.getElementById('sheetLengthRow').style.display = showSheetDimensions ? 'flex' : 'none';
+            document.getElementById('sheetWidthRow').style.display = showSheetDimensions ? 'flex' : 'none';
+            
+            document.getElementById('results').classList.add('show');
         }
-        
-        // **NEW LOGIC ADDED/MODIFIED HERE:** Sheet Dimensions Visibility
-        // Sheet Dimensions are ONLY shown for Admin (regardless of custom or standard)
-        const showSheetDimensions = role === 'admin';
-        document.getElementById('sheetLengthRow').style.display = showSheetDimensions ? 'flex' : 'none';
-        document.getElementById('sheetWidthRow').style.display = showSheetDimensions ? 'flex' : 'none';
-        
-        document.getElementById('results').classList.add('show');
-    }
-</script>
+    </script>
 </body>
 </html>
